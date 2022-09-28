@@ -3,20 +3,15 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const session = require('express-session')
 const dotenv = require('dotenv');
-const path = require('path')
-const mysql = require('mysql');
+const path = require('path');
+const swaggerUi = require('swagger-ui-express');
 
 dotenv.config();//.env를 환경변수로 사용
-const indexRouter = require('./routes');
-const userRouter = require('./routes/user');
+
+const mysqltest = require('./routes/mysql/index');
+const redistest = require('./routes/redis/index');
+
 const app = express();
-const connection = mysql.createConnection({
-    host:process.env.HOST,
-    user:process.env.USER,
-    //password:process.env.PASSWORD,
-    database:process.env.DATABASE
-});
-connection.connect();
 
 app.set('port',process.env.PORT||3000);
 
@@ -45,46 +40,9 @@ app.use(session({
     name:'session-cookie'
 }))
 
-app.use((req,res,next)=>{
-    console.log('모든 요청에 실행됨');
-    next();
-});
-
-app.use('/',indexRouter);
-app.use('/user',userRouter);
-app.use('/test',(req,res)=>{
-
-})
-
-app.get('/',(req,res,next)=>{
-    res.sendFile(path.join(__dirname, '/templates/index.html'));
-    console.log('GET / 요청에만 실행됨');
-    next();
-});
-
-app.post('/',(req,res,next)=>{
-    res.send('Hello, Express');
-    next()
-});
-
-app.put('/',(req,res,next)=>{
-    res.send('Hello, Express');
-    next()
-});
-
-app.delete('/',(req,res,next)=>{
-    res.send('Hello, Express');
-    next()
-});
-
-app.use((err,req,res,next)=>{
-    console.error(err);
-    res.status(500).send(err.message);
-});
-
-app.use((req,res)=>{
-    console.log('다 받아주기~')
-})
+app.use('/swagger',swaggerUi.serve);
+app.use('/mysql',mysqltest);
+app.use('/redis',redistest);
 
 app.listen(app.get('port'),()=>{
     console.log(app.get('port'),'번 포트에서 대기중')
