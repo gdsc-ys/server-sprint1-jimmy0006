@@ -2,10 +2,10 @@ const express=require('express');
 const connection = require('../mysqlConnector');
 const router = express.Router();
 
-// router.get('/postdata',(req,res)=>{
-//     connection.query("INSERT INTO abnormal.table1 (userId, blogId, name,zip, city,address, comment) VALUES (1,1,'Youngman',446916,'Seoul','apartment','this is sample comment');");
-//     res.send('success!');
-// });
+router.post('/',(req,res)=>{
+    connection.query(`INSERT INTO normal3.user (userId, name, zip) VALUES (${req.body.userid},'${req.body.name}',${req.body.zip});`);
+    res.send('success!');
+});
 
 // router.get('/getdata',(req,res)=>{
 //     connection.query('SELECT * FROM abnormal.table1',(error,rows,fields)=>{

@@ -2,8 +2,8 @@ const express=require('express');
 const connection = require('../mysqlConnector');
 const router = express.Router();
 
-router.get('/postdata',(req,res)=>{
-    connection.query("INSERT INTO abnormal.table1 (userId, blogId, name,zip, city,address, comment) VALUES (1,1,'Youngman',446916,'Seoul','apartment','this is sample comment');");
+router.post('/',(req,res)=>{
+    connection.query(`INSERT INTO abnormal.table1 (userId, blogId, name,zip, city,address, comment) VALUES (${req.body.userid},${req.body.blogid},'${req.body.name}',${req.body.zip},'${req.body.city}','${req.body.address}','${req.body.comment}');`);
     res.send('success!');
 });
 

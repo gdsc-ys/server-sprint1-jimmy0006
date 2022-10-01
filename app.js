@@ -4,7 +4,6 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session')
 const dotenv = require('dotenv');
 const path = require('path');
-const swaggerUi = require('swagger-ui-express');
 
 dotenv.config();//.env를 환경변수로 사용
 
@@ -40,7 +39,6 @@ app.use(session({
     name:'session-cookie'
 }))
 
-app.use('/swagger',swaggerUi.serve);
 app.use('/mysql',mysqltest);
 app.use('/redis',redistest);
 
