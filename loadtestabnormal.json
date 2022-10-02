@@ -1,0 +1,21 @@
+{
+    "config":{
+        "target":"http://localhost:3000",
+        "phases":[
+            {
+                "duration":10,
+                "arrivalRate":60
+            }
+        ]
+    },
+    "scenarios":[{
+        "name":"abnormal",
+        "flow":[
+            {
+                "get":{
+                    "url":"/mysql/abnormal/?userId=50&blogId=50"
+                }
+            }
+        ]
+    }]
+}

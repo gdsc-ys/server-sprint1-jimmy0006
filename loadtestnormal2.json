@@ -1,0 +1,21 @@
+{
+    "config":{
+        "target":"http://localhost:3000",
+        "phases":[
+            {
+                "duration":10,
+                "arrivalRate":60
+            }
+        ]
+    },
+    "scenarios":[{
+        "name":"normal2",
+        "flow":[
+            {
+                "get":{
+                    "url":"/mysql/normal2/?userId=25&blogId=80"
+                }
+            }
+        ]
+    }]
+}
