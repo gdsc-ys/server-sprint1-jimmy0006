@@ -4,8 +4,6 @@ const dotenv = require('dotenv');
 dotenv.config();//.env를 환경변수로 사용
 
 const client = redis.createClient({
-    // url:`redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
-    // password:process.env.REDIS_PASSWORD
     socket:{
         host:process.env.REDIS_HOST,
         port:process.env.REDIS_PORT
@@ -14,32 +12,49 @@ const client = redis.createClient({
 });
 const router = express.Router();
 
-router.use('/',(req,res,next)=>{
-    client.connect();
-    next();
+router.delete('/all',async (req,res)=>{
+    await client.connect();
+    await client.sendCommand(['FLUSHALL']);
+    client.quit();
+    res.send('deleted all');
 })
 
-router.get('/postdata',async (req,res,next)=>{
-    const reply = await client.set('user1','YM1');
-    res.send(reply);
-    next();
+router.post('/',async (req,res)=>{
+    await client.connect();
+    try{
+        if(req.body.id && req.body.password){
+            const result = await client.sendCommand(['HGET','user',req.body.id])
+            if(result) throw new Error('error')
+            await client.sendCommand(['HSET','user',req.body.id,req.body.password])
+            res.send("success!");
+        }else{
+            res.send("fail");
+            const error = new Error(`Invalid id or password`);
+            error.status = 404;
+        }
+    }catch(error){
+        res.status(500).send("Error occur!");
+    }
+    client.quit();
 });
 
-router.get('/getdata',async function(req,res,next){
-    const value = await client.get("user1");
-    res.send(value);
-    next();
-});
-
-router.use('/',(req,res)=>{
+router.post('/login',async (req,res)=>{
+    await client.connect();
+    try{
+        const result = await client.sendCommand(['HGET','user',req.body.id])
+        if(!result) throw new Error('no id');
+        if(result===req.body.password){
+            res.cookie('id',req.body.id,{
+                expires:new Date(Date.now()+900000),
+                httpOnly:true,
+                secure:true,
+            });
+        }
+        res.send("success!");
+    }catch(error){
+        res.status(500).send("Error occur!");
+    }
     client.quit();
 })
-
-// router.get('/deletedata',(req,res)=>{
-//     connection.query('DELETE FROM abnormal.table1 WHERE userId=1;',(error,rows,fields)=>{
-//         if(error) throw error;
-//         res.send(rows);
-//     });
-// });
 
 module.exports = router;

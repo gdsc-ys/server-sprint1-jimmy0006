@@ -6,5 +6,4 @@ const server = require('./server/server')
 router.use('/local',local);
 router.use('/server',server);
 
-
 module.exports = router;
