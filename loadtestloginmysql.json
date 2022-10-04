@@ -5,16 +5,20 @@
             {
                 "duration":10,
                 "arrivalRate":60,
-                "name":"abnormal"
+                "name":"mysql"
             }
         ]
     },
     "scenarios":[{
-        "name":"abnormal",
+        "name":"mysql",
         "flow":[
             {
-                "get":{
-                    "url":"/mysql/abnormal/?userId=1&blogId=1"
+                "post":{
+                    "url":"/mysql/member/login",
+                    "json":{
+                        "id":"user8000",
+                        "password":"1234"
+                    }
                 }
             }
         ]

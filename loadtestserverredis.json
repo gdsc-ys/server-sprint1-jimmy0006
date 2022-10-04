@@ -5,16 +5,20 @@
             {
                 "duration":10,
                 "arrivalRate":60,
-                "name":"abnormal"
+                "name":"serverredis"
             }
         ]
     },
     "scenarios":[{
-        "name":"abnormal",
+        "name":"serverredis",
         "flow":[
             {
-                "get":{
-                    "url":"/mysql/abnormal/?userId=1&blogId=1"
+                "post":{
+                    "url":"/redis/server/login",
+                    "json":{
+                        "id":"user10000",
+                        "password":"1234"
+                    }
                 }
             }
         ]
