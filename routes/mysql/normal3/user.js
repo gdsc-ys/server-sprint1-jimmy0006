@@ -1,5 +1,5 @@
 const express=require('express');
-const connection = require('../mysqlConnector');
+const connection = require('../../../databaseConnector/mysqlConnector');
 const router = express.Router();
 
 router.post('/',(req,res)=>{

@@ -1,20 +1,8 @@
 const express=require('express');
-const connection = require('../mysqlConnector');
+const connection = require('../../../databaseConnector/mysqlConnector');
 const router = express.Router();
 const querystring = require('querystring');
 
-/**
- * @api {get} /user/:id Request User information
- *
- * @apiVersion        1.0.0
- * @apiName GetUser
- * @apiGroup User
- *
- * @apiParam {Number} id Users unique ID.
- *
- * @apiSuccess {String} firstname Firstname of the User.
- * @apiSuccess {String} lastname  Lastname of the User.
- */
 router.post('/',(req,res)=>{
     connection.query(`INSERT INTO abnormal.table1 (userId, blogId, name,zip, city,address, comment) VALUES (${req.body.userid},${req.body.blogid},'${req.body.name}',${req.body.zip},'${req.body.city}','${req.body.address}','${req.body.comment}');`,(err,rows,fields)=>{
         if(err) throw err;
@@ -33,7 +21,6 @@ router.get('/',(req,res)=>{
         qs=qs.slice(0,-5);
         connection.query(`SELECT * FROM abnormal.table1 WHERE ${qs}`,(error,rows,fields)=>{
             if(error) throw error;
-            console.log(`someone select : ${qs}`);
             res.send(rows);
         });
     }
@@ -69,7 +56,6 @@ router.delete('/',(req,res)=>{
         qs=qs.slice(0,-5);
         connection.query(`DELETE FROM abnormal.table1 WHERE ${qs}`,(error,rows,fields)=>{
             if(error) throw error;
-            console.log(`someone delete : ${qs}`);
             res.send(rows);
         });
     }
