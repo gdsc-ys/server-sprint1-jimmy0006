@@ -1,19 +1,11 @@
 const express=require('express');
-const client = require('../../../databaseConnector/serverRedisConnector');
+const client = require('../../databaseConnector/localRedisConnector');
 const router = express.Router();
 
-//------------------------//
-
-router.delete('/all',async (req,res)=>{
-    await client.connect();
-    await client.sendCommand(['FLUSHALL']);
-    client.quit();
-    res.send('deleted all');
-})
 
 router.post('/login',async (req,res)=>{
     if(req.body.id && req.body.password){
-        await client.connect().catch(error=>{});
+        // await client.connect();
         const result = await client.sendCommand(['HGET','user',req.body.id])
         if(!result) throw new Error('no id');
         if(result===req.body.password){
@@ -32,9 +24,9 @@ router.post('/login',async (req,res)=>{
 })
 
 
-router.post('/',async (req,res,next)=>{
+router.post('/',(req,res,next)=>{
     if(req.body.id && req.body.password){
-        await client.connect().catch(error=>{});
+        // await client.connect();
         const result = client.sendCommand(['HGET','user',req.body.id])
         console.log(result);
         res.send('temp!')

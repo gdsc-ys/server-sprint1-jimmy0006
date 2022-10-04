@@ -1,58 +1,54 @@
 const express=require('express');
-const redis = require('redis');
-const querystring = require('querystring');
-const dotenv = require('dotenv');
-dotenv.config();//.env를 환경변수로 사용
-
-const client = redis.createClient({
-    url:`redis://127.0.0.1:6379`,
-});
+const client = require('../../../databaseConnector/localRedisConnector');
 const router = express.Router();
 
+//---------------------------//
+
 router.delete('/all',async (req,res)=>{
-    await client.connect();
+    // await client.connect();
     await client.sendCommand(['FLUSHALL']);
-    client.quit();
+    // client.quit();
     res.send('deleted all');
 })
 
-router.post('/',async (req,res,next)=>{
-    await client.connect();
-    try{
-        if(req.body.id && req.body.password){
-            const result = await client.sendCommand(['HGET','user',req.body.id])
-            if(result) throw new Error('error')
-            await client.sendCommand(['HSET','user',req.body.id,req.body.password])
-            res.send("success!");
-        }else{
-            res.send("fail");
-            const error = new Error(`Invalid id or password`);
-            error.status = 404;
-        }
-    }catch(error){
-        res.status(500).send("Error occur!");
-    }
-    client.quit();
-});
-
 router.post('/login',async (req,res)=>{
-    await client.connect();
-    try{
+    if(req.body.id && req.body.password){
+        await client.connect().catch(error=>{});
         const result = await client.sendCommand(['HGET','user',req.body.id])
         if(!result) throw new Error('no id');
         if(result===req.body.password){
-            res.cookie('id',req.body.id,{
-                expires:new Date(Date.now()+86400000),
-                httpOnly:true,
-                secure:true,
-                signed:true,
-            });
+            req.session.authenticate=true;
+            req.session.save(()=>{
+                res.send('success!');
+            })
+        }else{
+            //비밀번호가 일치하지 않을 경우
+            res.status(400).send('no id and password match')
         }
-        res.send("success!");
-    }catch(error){
-        res.status(500).send("Error occur!");
+    }else{
+        //body에 id나 password가 없을 경우
+        res.status(400).send('no id and password sended!')
     }
-    client.quit();
 })
+
+
+router.post('/',async (req,res,next)=>{
+    if(req.body.id && req.body.password){
+        await client.connect().catch(error=>{});
+        const result = client.sendCommand(['HGET','user',req.body.id])
+        console.log(result);
+        res.send('temp!')
+        if(result){
+            throw new Error('error')
+        }else{
+            client.sendCommand(['HSET','user',req.body.id,req.body.password])
+            res.send("success!");
+        }
+        
+        // client.quit();
+    }else{
+        res.status(400).send("fail");
+    }
+});
 
 module.exports = router;
